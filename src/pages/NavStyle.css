@@ -1,0 +1,14 @@
+.skeleton {
+  opacity: 0.7;
+  border-radius: 30px;
+  animation: skele-ani 1s linear infinite alternate;
+}
+
+@keyframes skele-ani {
+  0% {
+    background-color: hsl(200, 20%, 70%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
