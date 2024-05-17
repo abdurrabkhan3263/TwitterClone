@@ -139,7 +139,12 @@ function Profile({ className }) {
             <p className="text-2xl font-bold">
               {userData[1] && userData[1].name}
             </p>
-            <p className="font-normal text-gray-500">@raheemkhan</p>
+            <p className="font-normal text-gray-500">
+              @
+              {userData[1] &&
+                userData[1].name &&
+                userData[1].name.toLowerCase()}
+            </p>
             <p>{userData[1] && userData[1].bio}</p>
             <p className="pt-4  font-medium text-gray-500 text-[15px] flex items-center gap-1">
               <span className="text-xl">

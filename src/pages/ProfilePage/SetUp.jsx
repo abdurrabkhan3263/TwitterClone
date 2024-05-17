@@ -240,7 +240,7 @@ function SetUp({ setUp, postData }) {
                   }
                 />
                 <p className="text-[15px] text-gray-500 font-normal">
-                  @Raheemkhan434343
+                  @{postData[1].name.toLowerCase()}
                 </p>
               </div>
             </div>
