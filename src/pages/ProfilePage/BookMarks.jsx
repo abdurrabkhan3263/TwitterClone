@@ -3,10 +3,12 @@ import useData from "./useData";
 import { useSelector } from "react-redux";
 import AllPosts from "../AllPosts";
 import { Rolling, Loader } from "../../component/Icones/index";
+import { useParams } from "react-router-dom";
 
 function BookMarks() {
   const [loader, setLoader] = useState(true);
   const [data, setData] = useState([]);
+  const { id } = useParams();
   const [error, setError] = useState({ message: "", occurred: false });
   const user = useSelector((state) => state.appReducer.user);
   useEffect(() => {
@@ -14,7 +16,7 @@ function BookMarks() {
       .then((result) => {
         result &&
           result.map((postItems) => {
-            if (postItems.BookMarks.includes(user.user?.$id)) {
+            if (postItems.BookMarks.includes(id)) {
               setData((prev) => [postItems, ...prev]);
               setError({ message: "", occurred: false });
             }
@@ -22,7 +24,7 @@ function BookMarks() {
       })
       .catch((error) => setError({ message: error.message, occurred: true }))
       .finally(() => setLoader(false));
-  }, []);
+  }, [id]);
 
   if (error.occurred) {
     return (

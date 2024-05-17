@@ -19,7 +19,6 @@ function SignUpForm() {
       const user = await service.createAccount(data);
       if (user) {
         let userId = user.userId;
-        console.log("SignUp For User Data ", user);
         setRedirection(true);
         database
           .createUsers(userId, {
@@ -29,10 +28,11 @@ function SignUpForm() {
             followerUser: [],
             followUsers: [],
             name: data.name,
+            joinDate: user.$createdAt,
             isEdited: false,
           })
           .then((profileData) => {
-            console.log("Profile Data:- ", profileData);
+            console.log(profileData);
             setTimeout(() => {
               setRedirection(false);
               navigate("/home");
@@ -56,7 +56,7 @@ function SignUpForm() {
           </div>
         </div>
       ) : (
-        <div className="px-20 relative">
+        <div className="lg:px-20 px-4 relative">
           <h2 className="font-bold text-3xl">Create your account</h2>
           <p className="w-full text-center py-4">
             Already have an account?

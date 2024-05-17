@@ -19,9 +19,9 @@ function Login() {
     if (status) navigate("/home");
   }, [status]);
   return (
-    <div className="flex justify-between items-center h-screen px-96 relative">
+    <div className="lg:flex lg:justify-between lg:items-center h-screen lg:px-96 relative">
       <div
-        className={`p-2 absolute w-1/3 h-2/3 right-[50%] translate-x-[50%] bottom-[50%] translate-y-[50%] bg-white drop-shadow-2xl  rounded-xl ${
+        className={`p-2 absolute lg:w-1/3 w-[95%] lg:h-2/3 right-[50%] translate-x-[50%] bottom-[50%] translate-y-[50%] bg-white drop-shadow-2xl  rounded-xl ${
           !form ? "hidden" : "block"
         }`}
       >
@@ -37,19 +37,19 @@ function Login() {
         </div>
         <Outlet />
       </div>
-      <div className="w-1/3">
-        <Logo width="400px" />
+      <div className="lg:w-1/3 w-[50%]">
+        <Logo width="400px" className={"flex justify-center lg:block"} />
       </div>
 
-      <div className="w-2/3 flex justify-end">
-        <div>
+      <div className="lg:w-2/3 w-full lg:flex lg:justify-end">
+        <div className="flex lg:block flex-col pl-4 lg:pl-0">
           <div>
-            <h1 className=" text-7xl font-bold">Happening now</h1>
+            <h1 className="text-5xl lg:text-7xl font-bold">Happening now</h1>
             <div className="flex justify-between items-end">
               <h4 className="text-4xl font-semibold pt-6">Join today.</h4>
             </div>
           </div>
-          <div className="w-[70%] pt-6">
+          <div className="w-[90%] lg:w-[70%] pt-6">
             <div>
               <h3 className="font-semibold">Create Account</h3>
               <Button

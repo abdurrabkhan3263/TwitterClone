@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { database } from "../../appwrite";
 import { useSelector } from "react-redux";
+import useFindingImg from "../../Hook/useFindingImg";
 
 import {
   Comment,
@@ -25,11 +26,9 @@ function Post({ data }) {
     userId,
     like,
     comment,
-    userName,
     name,
     likeduser,
     posttime,
-    profileUrl,
     allImages,
     postimage,
     BookMarks,
@@ -37,10 +36,12 @@ function Post({ data }) {
   let [likeNum, setLikeNum] = useState(like);
   let [initial, setInitial] = useState(false);
   const user = useSelector((state) => state.appReducer.user);
+  const profileImg = useFindingImg(userId);
   let [isLike, setIsLike] = useState(likeduser.includes(user.user?.$id));
   const [isBookMark, setIsBookMark] = useState(
     BookMarks.includes(user.user?.$id)
   );
+
   const [updatedValue, setUpdatedValue] = useState(data);
   const navigate = useNavigate();
   const handlePostImageLeft = () => {
@@ -65,7 +66,6 @@ function Post({ data }) {
       window.location.reload();
     }
   };
-
   useEffect(() => {
     if (initial) {
       const likeCount = isLike ? likeNum + 1 : likeNum - 1;
@@ -82,7 +82,7 @@ function Post({ data }) {
           setUpdatedValue(updatedValue);
         });
     }
-  }, [isLike, , user.user?.$id]);
+  }, [isLike, user.user?.$id]);
 
   useEffect(() => {
     if (likeduser.includes(user.user?.$id)) {
@@ -131,7 +131,7 @@ function Post({ data }) {
         <div className="w-[46px] h-[46px] rounded-full overflow-hidden">
           <Link to="">
             <img
-              src={!profileUrl ? admin : profileUrl}
+              src={(profileImg[0] && profileImg[0]["profileImg"]) || admin}
               className="h-full w-full object-cover"
             />
           </Link>
@@ -144,10 +144,10 @@ function Post({ data }) {
               className="text-lg font-semibold cursor-pointer hover:underline"
               onClick={() => navigate(`/home/profile/${userId}`)}
             >
-              {name}
+              {profileImg[1] && profileImg[1]["name"]}
             </p>
             <p className="text-base cursor-pointer text-gray-600">
-              @ImamKhomini
+              @{name && name.toLowerCase()}
             </p>
             <p className="text-base cursor-pointer text-gray-600"> ∙ 2h</p>
           </div>
