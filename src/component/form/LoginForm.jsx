@@ -37,7 +37,7 @@ function LoginForm() {
   };
   return (
     <div>
-      <div className="px-20">
+      <div className="lg:px-20 px-2">
         <h2 className="font-bold text-3xl">Login your account</h2>
         <p className="w-full text-center py-4">
           Do you want to create account?

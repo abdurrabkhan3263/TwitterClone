@@ -2,11 +2,11 @@ import React from "react";
 
 function Logo({ width = "50px", className }) {
   return (
-    <div>
+    <div className={`${className}`}>
       <svg
         viewBox="0 0 24 24"
         aria-hidden="true"
-        className={`r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-18jsvk2 r-rxcuwo r-1777fci r-m327ed r-494qqr ${className}`}
+        className={`r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-18jsvk2 r-rxcuwo r-1777fci r-m327ed r-494qqr `}
         width={width}
       >
         <g>

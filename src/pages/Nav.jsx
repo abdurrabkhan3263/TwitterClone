@@ -13,6 +13,7 @@ import {
   VscAccount,
   IoBookmarkOutline,
 } from "../component/Icones/index";
+import { IoLogOutOutline } from "react-icons/io5";
 
 function Nav() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ function Nav() {
   const user = useSelector((state) => state.appReducer.user);
   const loader = useSelector((state) => state.appReducer.loader);
   const [navLoading, setNavLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const Navigation = [
     {
       icons: <FaHome />,
@@ -59,28 +61,31 @@ function Nav() {
     service
       .getCurrentUser()
       .then((user) => {
-        dispatch(login(user.status));
+        dispatch(login(user));
       })
       .catch(() => {
         dispatch(logout());
       })
-      .finally(() => dispatch(setLoader(true)));
+      .finally(() => {
+        setNavLoading(true);
+        dispatch(setLoader(true));
+      });
   }, []);
   const handleInOut = () => {
-    if (!user.status) {
-      navigate("/login-form");
-    } else if (user.status) {
-      service.logoutAccount().then(() => {
-        dispatch(logout());
-        navigate("/");
-      });
-    }
+    service.logoutAccount().then(() => {
+      dispatch(logout());
+      navigate("/");
+    });
   };
+
   useEffect(() => {
-    if (user.user && user.user.$id) {
-      setNavLoading(true);
+    if (window.innerWidth <= 530) {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
     }
-  }, [user.user]);
+  }, []);
+
   return (
     <div className="pt-5 fixed">
       <ul>
@@ -100,7 +105,7 @@ function Nav() {
               }}
               key={data.name}
               className={`text-black flex items-center gap-x-6 px-4 py-3 text-xl border-none ${
-                navLoading && "hover:bg-gray-200"
+                navLoading && "md:hover:bg-gray-200"
               } font-normal`}
             >
               <div className={`${navLoading || "skeleton"}`}>
@@ -110,7 +115,7 @@ function Nav() {
               </div>
               <div className={`${navLoading || "skeleton"}`}>
                 <span
-                  className={`hidden md:block ${navLoading || "opacity-0"}`}
+                  className={`hidden lg:block  ${navLoading || "opacity-0"}`}
                 >
                   {data.name}
                 </span>
@@ -119,23 +124,27 @@ function Nav() {
           ))}
         </li>
         <li>
-          <Button
-            className={`${
-              !navLoading ? "skeleton" : "bg-blue-500"
-            } text-white w-full border-none py-2`}
-          >
-            <span>Post</span>
-          </Button>
-        </li>
-        <li>
-          <Button
-            className={`${
-              !navLoading ? "skeleton" : "bg-blue-500"
-            } text-white w-full border-none py-2`}
-            onClick={handleInOut}
-          >
-            <span> {!user.status ? "Login" : "Log Out"}</span>
-          </Button>
+          {!isMobile ? (
+            <Button
+              className={`${
+                !navLoading ? "skeleton" : "bg-blue-500"
+              } text-white w-full border-none py-2`}
+              onClick={handleInOut}
+            >
+              <span>{!user.status ? "Login" : "Log Out"}</span>
+            </Button>
+          ) : (
+            <Button
+              className={`${
+                !navLoading ? "skeleton" : ""
+              } text-black w-full border-none py-2 pl-4`}
+              onClick={handleInOut}
+            >
+              <span className="text-3xl w-full">
+                {!user.status ? "Login" : <IoLogOutOutline />}
+              </span>
+            </Button>
+          )}
         </li>
       </ul>
     </div>

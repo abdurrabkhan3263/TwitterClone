@@ -21,7 +21,7 @@ function Posts() {
         setError({ message: error.message, occurred: true });
       })
       .finally(() => setLoader(false));
-  }, []);
+  }, [id]);
   if (error.occurred) {
     return (
       <h1 className=" text-center mt-4 text-2xl font-bold text-red-500">

@@ -13,22 +13,18 @@ import {
 } from "../../component/Icones/index";
 import { Input } from "../../component/index";
 import { useForm } from "react-hook-form";
-import { useSelector, useDispatch } from "react-redux";
 import { database } from "../../appwrite";
-import { login } from "../../store/appSlice";
 
 function SetUp({ setUp, postData }) {
   const [pagesNum, setPagesNum] = useState(1);
-  const user = useSelector((state) => state.appReducer.user);
   const [loader, setLoader] = useState(false);
   const [error, setError] = useState("");
-  const dispatch = useDispatch();
   const [textAreaElements, setTextAreaElements] = useState({
     redColor: false,
     focus: false,
     height: "28px",
   });
-  const { register, handleSubmit, getValues } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: {
       profileImg: postData[1]?.profileImg || "",
       headerImg: postData[1]?.headerImg || "",
@@ -43,10 +39,6 @@ function SetUp({ setUp, postData }) {
     name: "",
   });
   const [buttonValue, setButtonValue] = useState("Skip for Now");
-
-  useEffect(() => {
-    console.log(postData);
-  }, [postData]);
 
   const handleSetUp = () => {
     setButtonValue("Skip for Now");
@@ -122,6 +114,7 @@ function SetUp({ setUp, postData }) {
           }
         }
       });
+      data.isEdited = true;
       Promise.all(promises).then(() =>
         database
           .updateUsers(postData[1].$id, { ...data })
@@ -144,7 +137,7 @@ function SetUp({ setUp, postData }) {
   }
 
   return (
-    <div className="pt-4 px-20 flex flex-col h-full pb-4">
+    <div className="pt-4 px-8 md:px-20 flex flex-col h-full pb-4">
       <form onSubmit={handleSubmit(formSubmit)} className="h-full">
         {pagesNum === 1 ? (
           <div
@@ -171,7 +164,7 @@ function SetUp({ setUp, postData }) {
               <h1 className="text-3xl font-bold">Pick a profile picture</h1>
               <p>Have favorite selfie? Upload it now.</p>
             </div>
-            <div className="flex justify-center items-center w-60 h-60 rounded-full absolute right-1/2 translate-x-1/2 bottom-1/2 translate-y-1/2 overflow-hidden">
+            <div className="flex justify-center items-center w-48 h-48 md:w-60 md:h-60 rounded-full absolute right-1/2 translate-x-1/2 bottom-1/2 translate-y-1/2 overflow-hidden">
               <div className="absolute w-12 h-12 rounded-full overflow-hidden z-10 bg-gray-800 flex justify-center items-center overflow">
                 <Input
                   type="file"
