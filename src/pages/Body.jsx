@@ -4,7 +4,7 @@ import { Nav } from "./index";
 function Home() {
   return (
     <div className="flex text-blue-500 justify-center">
-      <div className="w-[70%]">
+      <div className="w-full  lg:w-[70%]">
         <Nav />
         <Outlet />
       </div>

@@ -51,7 +51,7 @@ function App() {
       });
   }, [isGetUrl]);
   return !loader ? (
-    <div className="w-screen h-screen bg-black text-white text-9xl flex justify-center items-center">
+    <div className="w-screen h-screen bg-black text-white text-9xl flex justify-center sm:justify-center items-center">
       <FaXTwitter />
     </div>
   ) : (

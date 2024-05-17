@@ -124,6 +124,7 @@ class databases {
       followerUser = [],
       name,
       isEdited,
+      joinDate,
     }
   ) {
     try {
@@ -139,6 +140,7 @@ class databases {
           headerImg,
           isEdited,
           name,
+          joinDate,
         }
       );
     } catch (error) {
@@ -187,17 +189,17 @@ class databases {
       throw ("AppWrite :: Error :: GettingUsers :: Error ", error);
     }
   }
-  // async createProfileImage(file) {
-  //   try {
-  //     return await this.storage.createFile(
-  //       conf.appWriteStorageId,
-  //       ID.unique(),
-  //       file
-  //     );
-  //   } catch (error) {
-  //     throw ("AppWrite :: Error :: CreateProfileImage :: Error ", error);
-  //   }
-  // }
+  async gettingAllUser(id) {
+    try {
+      return await this.database.listDocuments(
+        conf.appWriteDatabaseId,
+        conf.appWriteUser,
+        [Query.limit(2)]
+      );
+    } catch (error) {
+      throw ("Appwrite :: Error :: GettingAllUsers :: Error ", error);
+    }
+  }
   async getProfileUrl(fileId) {
     try {
       return this.storage.getFilePreview(conf.appWriteStorageId, fileId);

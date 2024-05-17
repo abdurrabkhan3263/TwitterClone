@@ -56,7 +56,7 @@ function CreatePost() {
         console.log(data);
         try {
           await database.createPost({ ...data });
-          // window.location.reload();
+          window.location.reload();
           setValue("post", "");
           setValue("images", "");
           setSrc([]);

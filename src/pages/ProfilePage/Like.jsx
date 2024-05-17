@@ -3,10 +3,12 @@ import { useSelector } from "react-redux";
 import { Rolling, Loader } from "../../component/Icones/index";
 import AllPosts from "../AllPosts";
 import useData from "./useData";
+import { useParams } from "react-router-dom";
 
 function Like() {
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(true);
+  const { id } = useParams();
   const [error, setError] = useState(false);
   const user = useSelector((state) => state.appReducer.user);
   useEffect(() => {
@@ -14,7 +16,7 @@ function Like() {
       .then((postItems) => {
         setError(false);
         postItems.map((postData) => {
-          if (postData.likeduser.includes(user.user?.$id)) {
+          if (postData.likeduser.includes(id)) {
             setData((prev) => [postData, ...prev]);
           }
         });
@@ -23,7 +25,7 @@ function Like() {
         setError(error);
       })
       .finally(() => setLoader(false));
-  }, []);
+  }, [id]);
   return !loader ? (
     <div>
       <div>
