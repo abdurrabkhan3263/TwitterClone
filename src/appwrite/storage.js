@@ -141,6 +141,7 @@ class databases {
           isEdited,
           name,
           joinDate,
+          userId,
         }
       );
     } catch (error) {
@@ -194,7 +195,7 @@ class databases {
       return await this.database.listDocuments(
         conf.appWriteDatabaseId,
         conf.appWriteUser,
-        [Query.limit(2)]
+        [Query.limit(2), Query.notEqual("userId", id)]
       );
     } catch (error) {
       throw ("Appwrite :: Error :: GettingAllUsers :: Error ", error);

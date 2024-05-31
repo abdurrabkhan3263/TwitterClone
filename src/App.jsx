@@ -3,13 +3,11 @@ import { useEffect, useState } from "react";
 import service from "./appwrite/auth";
 import { useSelector, useDispatch } from "react-redux";
 import { login, logout, setLoader } from "./store/appSlice";
-import { Logo } from "./component";
 import { FaXTwitter } from "./component/Icones/index";
 import { database } from "./appwrite";
 
 function App() {
   const loader = useSelector((state) => state.appReducer.loader);
-  // const [loader, setLoader] = useState(false);
   const [userImgUrl, setUserImgUrl] = useState({});
   const [isGetUrl, setIsGetUrl] = useState(false);
   const dispatch = useDispatch();

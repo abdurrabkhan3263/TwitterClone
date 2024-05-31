@@ -30,9 +30,9 @@ function SignUpForm() {
             name: data.name,
             joinDate: user.$createdAt,
             isEdited: false,
+            userId: userId,
           })
-          .then((profileData) => {
-            console.log(profileData);
+          .then(() => {
             setTimeout(() => {
               setRedirection(false);
               navigate("/home");

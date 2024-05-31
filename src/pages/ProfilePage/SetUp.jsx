@@ -169,7 +169,7 @@ function SetUp({ setUp, postData }) {
                 <Input
                   type="file"
                   className="opacity-0 relative z-[11]"
-                  accept="image/jpg,image/png,image/gif"
+                  accept="image/png, image/jpeg,image/jpg,image/gif"
                   {...register("profileImg")}
                   onChange={(e) => {
                     setFormData((prev) => ({
@@ -210,7 +210,7 @@ function SetUp({ setUp, postData }) {
                   <Input
                     type="file"
                     className="relative z-40 opacity-0 cursor-default h-full"
-                    accept="image/jpg,image/png,image/gif"
+                    accept="image/png, image/jpeg,image/jpg,image/gif"
                     {...register("headerImg")}
                     onChange={(e) =>
                       setFormData((prev) => ({

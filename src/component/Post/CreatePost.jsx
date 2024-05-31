@@ -11,7 +11,7 @@ function CreatePost() {
   const [textareaHeight, setTextareaHeight] = useState("5vh");
   const [posting, setPosting] = useState(false);
   let [src, setSrc] = useState([]);
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, getValues } = useForm();
   const navigate = useNavigate();
   const user = useSelector((state) => state.appReducer.user);
   const handleInputChange = (event) => {
@@ -28,7 +28,7 @@ function CreatePost() {
   const removeImage = (e) => {
     setSrc((prev) =>
       prev.filter((value, index) => {
-        return index != e.target.id;
+        return index != e.target.closest("div").id;
       })
     );
   };
@@ -90,7 +90,7 @@ function CreatePost() {
             {...register("post", { required: true })}
           ></textarea>
           <div className="w-full h-[1px] bg-gray-300 "></div>
-          <div className="w-full  overflow-y-hidden overflow-x-hidden rounded-xl mt-4 flex flex-wrap gap-y-4 justify-center">
+          <div className="w-full  overflow-y-hidden overflow-x-hidden select-none rounded-xl mt-4 flex flex-wrap gap-y-4 justify-center">
             {src.map((value, index) => (
               <div
                 className="relative overflow-hidden rounded-xl border"
@@ -119,7 +119,7 @@ function CreatePost() {
               <input
                 type="file"
                 multiple
-                accept="image/jpg,image/png,image/gif"
+                accept="image/png, image/jpeg,image/jpg,image/gif"
                 className="opacity-0"
                 {...register("images")}
                 onChange={handlePostImage}
