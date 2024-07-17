@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Profiler, useEffect, useMemo, useState } from "react";
 import { Button } from "../index";
 import { useForm } from "react-hook-form";
 import { Image, Rolling, admin } from "../Icones";
@@ -6,10 +6,12 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import database from "../../appwrite/storage";
 import { Loader, IoClose } from "../Icones/index";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function CreatePost() {
   const [textareaHeight, setTextareaHeight] = useState("5vh");
   const [posting, setPosting] = useState(false);
+  const [loading, setLoading] = useState(false);
   let [src, setSrc] = useState([]);
   const { register, handleSubmit, setValue, getValues } = useForm();
   const navigate = useNavigate();
@@ -32,48 +34,77 @@ function CreatePost() {
       })
     );
   };
+
+  const client = useQueryClient();
+
+  const createPost = useMutation({
+    mutationKey: ["createPost"],
+    mutationFn: async (data) => {
+      return await database.createPost(data);
+    },
+    onSuccess: () => {
+      setPosting(false);
+      setValue("post", "");
+      setSrc([]);
+      setLoading(false);
+      client.invalidateQueries({ queryKey: ["post"] });
+    },
+    onError: (error) => {
+      setPosting(false);
+      setLoading(false);
+      throw new Error(error.message);
+    },
+  });
+
+  const { data: profileImg } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const currentUser = await database.gettingUsers(user?.user.$id);
+      console.log(currentUser);
+      if (currentUser) {
+        return currentUser?.profileImg
+          ? (await database.getProfileUrl(currentUser?.profileImg))?.href
+          : null;
+      }
+    },
+  });
+
   const postSubmit = async (data) => {
     if (!posting) {
       setPosting(true);
+      setLoading(true);
       if (!user.status) {
         navigate("/login-form");
       } else {
-        let ids = [];
-        for (let i = 0; i < src.length; i++) {
-          let file = await database.createFile(src[i]);
-          console.log(src[i]);
-          if (file) {
-            ids.push(file.$id);
+        let url = [];
+
+        if (src.length > 0) {
+          for (let i = 0; i < src.length; i++) {
+            let file = await database.createFile(src[i]);
+            if (file) {
+              const imgUrl = database.getFilesPreview(file?.$id);
+              imgUrl && url.push({ img_url: imgUrl?.href, id: file?.$id });
+            }
           }
         }
-        data.postimage = ids;
+
+        data.postimage = JSON.stringify(url);
         data.userId = user.user.$id;
         data.userName = "";
         data.like = 0;
         data.name = user.user.name;
         data.comment = [];
         data.posttime = Date.now();
-        console.log(data);
-        try {
-          await database.createPost({ ...data });
-          window.location.reload();
-          setValue("post", "");
-          setValue("images", "");
-          setSrc([]);
-        } catch (error) {
-          throw ("Error is Posting :: error ", error);
-        } finally {
-          setPosting(false);
-        }
+        createPost.mutate(data);
       }
     }
   };
   return (
     <div className="w-full flex px-4 pt-5 border-b">
       <div className="ProfilePic">
-        <div className="h-[52px] w-[52px] bg-black rounded-full overflow-hidden">
+        <div className="h-[52px] w-[52px] bg-gray-300 rounded-full overflow-hidden">
           <img
-            src={(user.user && user.user.profileImg) || admin}
+            src={profileImg || admin}
             className="h-full w-full object-cover"
             alt="Profile"
           />
@@ -131,7 +162,7 @@ function CreatePost() {
               }
               type={"submit"}
             >
-              {!posting ? (
+              {!loading ? (
                 "Post"
               ) : (
                 <Loader className="w-[18px] py-1" loaderSrc={Rolling} />

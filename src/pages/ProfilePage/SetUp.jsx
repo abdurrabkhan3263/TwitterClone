@@ -14,11 +14,13 @@ import {
 import { Input } from "../../component/index";
 import { useForm } from "react-hook-form";
 import { database } from "../../appwrite";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function SetUp({ setUp, postData }) {
   const [pagesNum, setPagesNum] = useState(1);
   const [loader, setLoader] = useState(false);
   const [error, setError] = useState("");
+  const client = useQueryClient();
   const [textAreaElements, setTextAreaElements] = useState({
     redColor: false,
     focus: false,
@@ -78,54 +80,68 @@ function SetUp({ setUp, postData }) {
     }
   }, [formData.bioData]);
 
+  const setup = useMutation({
+    mutationKey: ["setup"],
+    mutationFn: async (data) => {
+      if (!loader) {
+        if (
+          formData.bioData === "" &&
+          formData.headerImg === "" &&
+          formData.profileImg === "" &&
+          formData.name === ""
+        ) {
+          setUp(false);
+          return;
+        }
+        let keys = ["profileImg", "headerImg"];
+        let promises = keys.map(async (key) => {
+          if (postData[1][key]) {
+            let file =
+              postData[1][key] !== data[key]
+                ? await database.deleteFile(postData[1][key])
+                : null;
+            if (file) {
+              return database.createFile(data[key][0]).then((fileId) => {
+                if (fileId) {
+                  data[key] = fileId.$id;
+                }
+              });
+            }
+          } else {
+            if (data[key]) {
+              return database.createFile(data[key][0]).then((fileId) => {
+                data[key] = fileId.$id;
+              });
+            }
+          }
+        });
+        data.isEdited = true;
+        Promise.all(promises).then(() =>
+          database
+            .updateUsers(postData[1].$id, { ...data })
+            .then(() => {
+              setUp(false);
+            })
+            .catch((error) => setError(error))
+        );
+      }
+    },
+    onSuccess: () => {
+      setLoader(false);
+      client.invalidateQueries({ queryKey: ["setup"] });
+    },
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
+
   // FORM SUBMIT
   const formSubmit = async (data) => {
     setError("");
     setLoader(true);
-    if (!loader) {
-      if (
-        formData.bioData === "" &&
-        formData.headerImg === "" &&
-        formData.profileImg === "" &&
-        formData.name === ""
-      ) {
-        setUp(false);
-        return;
-      }
-      let keys = ["profileImg", "headerImg"];
-      let promises = keys.map(async (key) => {
-        if (postData[1][key]) {
-          let file =
-            postData[1][key] !== data[key]
-              ? await database.deleteFile(postData[1][key])
-              : null;
-          if (file) {
-            return database.createFile(data[key][0]).then((fileId) => {
-              if (fileId) {
-                data[key] = fileId.$id;
-              }
-            });
-          }
-        } else {
-          if (data[key]) {
-            return database.createFile(data[key][0]).then((fileId) => {
-              data[key] = fileId.$id;
-            });
-          }
-        }
-      });
-      data.isEdited = true;
-      Promise.all(promises).then(() =>
-        database
-          .updateUsers(postData[1].$id, { ...data })
-          .then(() => {
-            setUp(false);
-          })
-          .catch((error) => setError(error))
-          .finally(() => setLoader(false))
-      );
-    }
+    setup.mutate(data);
   };
+
   if (Object.keys(postData[0]).length <= 0 && postData[1].length <= 0) {
     return (
       <Loader

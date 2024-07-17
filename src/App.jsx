@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import service from "./appwrite/auth";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,6 +11,8 @@ function App() {
   const [userImgUrl, setUserImgUrl] = useState({});
   const [isGetUrl, setIsGetUrl] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
     service
       .getCurrentUser()
@@ -27,11 +29,12 @@ function App() {
               );
             if (profileImg)
               promises.push(
-                database
-                  .getProfileUrl(profileImg)
-                  .then((url) =>
-                    setUserImgUrl((prev) => ({ ...prev, profileImg: url.href }))
-                  )
+                database.getProfileUrl(profileImg).then((url) =>
+                  setUserImgUrl((prev) => ({
+                    ...prev,
+                    profileImg: url.href,
+                  }))
+                )
               );
             setIsGetUrl(true);
           }
@@ -43,6 +46,7 @@ function App() {
       })
       .catch(() => {
         dispatch(logout());
+        navigate("/");
       })
       .finally(() => {
         dispatch(setLoader(true));

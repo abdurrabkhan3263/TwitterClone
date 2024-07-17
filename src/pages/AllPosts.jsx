@@ -3,33 +3,21 @@ import { Post } from "../component";
 import { database, AuthService } from "../appwrite/index";
 
 function AllPosts({ data }) {
-  let [newPost, setNewPost] = useState([]);
-
-  useEffect(() => {
-    data &&
-      data.forEach((post) => {
-        let id = [];
-        post.postimage.forEach((imgId) => {
-          const imgUrl = database.getFilesPreview(imgId);
-          if (imgUrl) {
-            id.push(imgUrl.href);
-          }
-        });
-        post.allImages = [...id];
-      });
-    setNewPost(data);
-  }, [data]);
-
   return (
     <div>
-      {newPost &&
-        newPost.map((data, index) => {
+      {data.length > 0 ? (
+        data.map((data, index) => {
           return (
             <div key={data.$id}>
-              <Post data={newPost[newPost.length - 1 - index]} />
+              <Post data={data} />
             </div>
           );
-        })}
+        })
+      ) : (
+        <div className="flex justify-center">
+          <p className="text-3xl font-medium pt-7">No Post Found</p>
+        </div>
+      )}
     </div>
   );
 }

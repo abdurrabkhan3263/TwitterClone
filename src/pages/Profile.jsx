@@ -25,7 +25,6 @@ function Profile({ className }) {
       FollowUnFollow(user.user && user.user.$id, id);
     }
   };
-
   useEffect(() => {
     setFollowLoading(true);
     if (Object.keys(userData[1]).length > 0) {

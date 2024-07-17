@@ -17,6 +17,7 @@ import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Post({ data }) {
   const [deleteSlider, setDeleteSlider] = useState(false);
@@ -29,43 +30,55 @@ function Post({ data }) {
     name,
     likeduser,
     posttime,
-    allImages,
-    postimage,
+    postimage: images,
     BookMarks,
   } = data;
+
   let [likeNum, setLikeNum] = useState(like);
   let [initial, setInitial] = useState(false);
+  let postimage = JSON.parse(images);
   const user = useSelector((state) => state.appReducer.user);
   const profileImg = useFindingImg(userId);
   let [isLike, setIsLike] = useState(likeduser.includes(user.user?.$id));
+  const queryClient = useQueryClient();
   const [isBookMark, setIsBookMark] = useState(
     BookMarks.includes(user.user?.$id)
   );
 
   const [updatedValue, setUpdatedValue] = useState(data);
   const navigate = useNavigate();
-  const handlePostImageLeft = () => {
-    console.log("Left");
-  };
+  const handlePostImageLeft = () => {};
 
-  const handlePostImageRight = () => {
-    console.log("right");
-  };
+  const handlePostImageRight = () => {};
 
   const handleLikeBtn = async () => {
     setIsLike((prev) => !prev);
     setInitial(true);
   };
 
-  const handlePostDelete = async () => {
-    for (let i = 0; i < postimage.length; i++) {
-      await database.deleteFile(postimage[i]);
-    }
-    let file = await database.deletePost($id);
-    if (file) {
-      window.location.reload();
-    }
-  };
+  const deletePost = useMutation({
+    mutationKey: ["delete"],
+    mutationFn: async () => {
+      if (postimage.length > 0) {
+        for (let i = 0; i < postimage.length; i++) {
+          await database.deleteFile(postimage[i].id);
+        }
+      }
+      let file = await database.deletePost($id);
+      return file;
+    },
+    onSuccess: () => {
+      setDeleteSlider(false);
+      queryClient.invalidateQueries({ queryKey: ["post"] });
+    },
+    onError: (error) => {
+      setDeleteSlider(false);
+      throw new Error(error.message);
+    },
+  });
+
+  const handlePostDelete = async () => deletePost.mutate();
+
   useEffect(() => {
     if (initial) {
       const likeCount = isLike ? likeNum + 1 : likeNum - 1;
@@ -97,7 +110,9 @@ function Post({ data }) {
   }, []);
 
   document.addEventListener("click", (e) => {
-    if (e.target.id !== "deletepost") {
+    const classes = Array.from(e.target.classList);
+
+    if (!classes.includes("deletePost")) {
       setDeleteSlider(false);
     }
   });
@@ -121,10 +136,10 @@ function Post({ data }) {
         } transition-all`}
       >
         <button
-          className={`bg-white text-start py-1.5 px-2.5 text-base font-medium rounded-md transition-all hover:bg-slate-200 shadow-md`}
+          className={`deletePost bg-white text-start py-1.5 px-2.5 text-base font-medium rounded-md transition-all hover:bg-slate-200 shadow-md`}
           onClick={handlePostDelete}
         >
-          Delete Post
+          {deletePost.isPending ? "Deleting..." : "Delete Post"}
         </button>
       </div>
       <div className="PROFILE PIC h-full pr-1">
@@ -137,7 +152,7 @@ function Post({ data }) {
           </Link>
         </div>
       </div>
-      <div>
+      <div className="w-full">
         <div className="flex justify-between items-start relative">
           <div className="flex gap-3 ml-3 h-fit items-center">
             <p
@@ -154,11 +169,9 @@ function Post({ data }) {
           {user.user?.$id === userId ? (
             <div
               onClick={() => setDeleteSlider(!deleteSlider)}
-              className="flex flex-col items-center"
+              className="deletePost flex flex-col items-center"
             >
-              <p className="select-none" id="deletepost">
-                ∘ ∘ ∘
-              </p>
+              <p className="deletePost select-none">∘ ∘ ∘</p>
             </div>
           ) : (
             ""
@@ -174,10 +187,10 @@ function Post({ data }) {
               <IoIosArrowDropleftCircle />
             </div>
             <div className={`flex overflow-x-scroll`}>
-              {allImages && allImages.length > 0
-                ? allImages.map((value) => (
+              {postimage && postimage.length > 0
+                ? postimage.map((value) => (
                     <img
-                      src={value}
+                      src={value.img_url}
                       alt="post"
                       className={`transition-all`}
                       key={value}

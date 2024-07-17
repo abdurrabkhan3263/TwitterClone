@@ -5,24 +5,34 @@ import AllPosts from "./AllPosts";
 import { database } from "../appwrite";
 import { Rolling, Loader } from "../component/Icones";
 import { RightSection } from "./index";
+import { useQuery } from "@tanstack/react-query";
 
 const Home = ({ className }) => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState({ message: "", occurred: false });
-  const [loader, setLoader] = useState(false);
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await database.getAllPosts();
-        if (data.documents) {
-          setData(data.documents);
-          setError({ message: "", occurred: true });
-        }
-      } catch (error) {
-        setError({ message: error.message, occurred: false });
-      }
-    })().finally(() => setLoader(true));
-  }, []);
+  const {
+    data = "",
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["post"],
+    queryFn: async () => {
+      return await database.getAllPosts();
+    },
+  });
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const data = await database.getAllPosts();
+  //       if (data.documents) {
+  //         setData(data.documents);
+  //         setError({ message: "", occurred: true });
+  //       }
+  //     } catch (error) {
+  //       setError({ message: error.message, occurred: false });
+  //     }
+  //   })().finally(() => setLoader(true));
+  // }, []);
+
   return (
     <Container className={`flex justify-between relative ${className}`}>
       <div className="w-[100%] sm:w-[60%] border-gray-200 border text-wrap">
@@ -37,18 +47,16 @@ const Home = ({ className }) => {
         <div>
           <CreatePost />
           <div>
-            {loader ? (
-              error.occurred ? (
-                <AllPosts data={data && data} />
-              ) : (
-                <h1 className=" text-center mt-4 text-2xl font-bold text-red-600">
-                  {error.message}
-                </h1>
-              )
-            ) : (
+            {isLoading ? (
               <div className="w-full text-center mt-12">
                 <Loader loaderSrc={Rolling} className={"w-12"} />
               </div>
+            ) : isError ? (
+              <h1 className=" text-center mt-4 text-2xl font-bold text-red-600">
+                {error && error.message}
+              </h1>
+            ) : (
+              Array.isArray(data) && <AllPosts data={data} />
             )}
           </div>
         </div>

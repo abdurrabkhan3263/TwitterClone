@@ -57,10 +57,11 @@ class databases {
   }
   async getAllPosts() {
     try {
-      return await this.database.listDocuments(
+      const response = await this.database.listDocuments(
         conf.appWriteDatabaseId,
         conf.appWriteCollectionId
       );
+      return response.documents.reverse();
     } catch (error) {
       throw ("AppWrite :: getAllPosts :: Error :: ", error);
     }
@@ -107,6 +108,7 @@ class databases {
     }
   }
   getFilesPreview(fileID) {
+    if (!fileID) return "";
     try {
       return this.storage.getFilePreview(conf.appWriteStorageId, fileID);
     } catch (error) {
@@ -187,7 +189,7 @@ class databases {
         userId
       );
     } catch (error) {
-      throw ("AppWrite :: Error :: GettingUsers :: Error ", error);
+      throw new Error("AppWrite :: Error :: GettingUsers :: Error ", error);
     }
   }
   async gettingAllUser(id) {

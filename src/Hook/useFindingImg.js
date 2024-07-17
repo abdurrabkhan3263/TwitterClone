@@ -6,6 +6,7 @@ function useFindingImg(id, status) {
   const [profileUrl, setProfileUrl] = useState({});
   const [userData, setUserData] = useState([]);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (!id) return;
     setLoading(false);
