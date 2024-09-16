@@ -38,6 +38,7 @@ function Profile({ className }) {
         .finally(() => setFollowLoading(false));
     }
   }, [id, isFollow, user.user, userData[1]]);
+
   return (
     <Container className={`flex justify-between relative ${className}`}>
       {isSetUp ? (

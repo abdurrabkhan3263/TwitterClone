@@ -83,48 +83,46 @@ function SetUp({ setUp, postData }) {
   const setup = useMutation({
     mutationKey: ["setup"],
     mutationFn: async (data) => {
-      if (!loader) {
-        if (
-          formData.bioData === "" &&
-          formData.headerImg === "" &&
-          formData.profileImg === "" &&
-          formData.name === ""
-        ) {
-          setUp(false);
-          return;
-        }
-        let keys = ["profileImg", "headerImg"];
-        let promises = keys.map(async (key) => {
-          if (postData[1][key]) {
-            let file =
-              postData[1][key] !== data[key]
-                ? await database.deleteFile(postData[1][key])
-                : null;
-            if (file) {
-              return database.createFile(data[key][0]).then((fileId) => {
-                if (fileId) {
-                  data[key] = fileId.$id;
-                }
-              });
-            }
-          } else {
-            if (data[key]) {
-              return database.createFile(data[key][0]).then((fileId) => {
-                data[key] = fileId.$id;
-              });
-            }
-          }
-        });
-        data.isEdited = true;
-        Promise.all(promises).then(() =>
-          database
-            .updateUsers(postData[1].$id, { ...data })
-            .then(() => {
-              setUp(false);
-            })
-            .catch((error) => setError(error))
-        );
+      if (
+        formData.bioData === "" &&
+        formData.headerImg === "" &&
+        formData.profileImg === "" &&
+        formData.name === ""
+      ) {
+        setUp(false);
+        return;
       }
+      let keys = ["profileImg", "headerImg"];
+      let promises = keys.map(async (key) => {
+        if (postData[1][key]) {
+          let file =
+            postData[1][key] !== data[key]
+              ? await database.deleteFile(postData[1][key])
+              : null;
+          if (file) {
+            return database.createFile(data[key][0]).then((fileId) => {
+              if (fileId) {
+                data[key] = fileId.$id;
+              }
+            });
+          }
+        } else {
+          if (data[key]) {
+            return database.createFile(data[key][0]).then((fileId) => {
+              data[key] = fileId.$id;
+            });
+          }
+        }
+      });
+      data.isEdited = true;
+      Promise.all(promises).then(() =>
+        database
+          .updateUsers(postData[1].$id, { ...data })
+          .then(() => {
+            setUp(false);
+          })
+          .catch((error) => setError(error))
+      );
     },
     onSuccess: () => {
       setLoader(false);
@@ -137,9 +135,10 @@ function SetUp({ setUp, postData }) {
 
   // FORM SUBMIT
   const formSubmit = async (data) => {
+    alert("Form Submitted");
     setError("");
+    if (!loader) setup.mutate(data);
     setLoader(true);
-    setup.mutate(data);
   };
 
   if (Object.keys(postData[0]).length <= 0 && postData[1].length <= 0) {
